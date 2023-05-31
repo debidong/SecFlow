@@ -7,24 +7,34 @@ from .serializer import UserSerializer
 from .models import User
 
 class UserView(APIView):
+    # register
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
         uid = request.data.get('uid')
-        
-        new_user = User()
-        new_user.set_user_info(username=username, password=password, uid=uid)
-        new_user.save()
-
-        return Response({'status':'true'},status=status.HTTP_200_OK)
-    def get(self, request):
-        username = request.data.get('username')
         password = request.data.get('password')
-        login = User(username=username, password=password)
-        if login != None:
-            return Response({'status':'true'}, status=status.HTTP_200_OK)
+        username = request.data.get('username')
+        uid_check = User.objects.all().filter(uid=uid)
+        if uid_check.exists():
+            return Response({'status':'occupied'},status=status.HTTP_200_OK)
         else:
-            return Response({'status':'false'}, status=status.HTTP_401_UNAUTHORIZED)        
+            new_user = User()
+            new_user.set_user_info(username=username, password=password, uid=uid)
+            new_user.save()
+            return Response({'status':'true'},status=status.HTTP_200_OK)
+    # login
+    def get(self, request):
+        uid = request.query_params['uid']
+        password = request.query_params['password']
+        login_check = User.objects.all().filter(uid=uid)
+        print(uid)
+        print(password)
+        if not login_check.exists():
+            return Response({'status':'user-not-exist'}, status=status.HTTP_200_OK)
+        else:
+            login_check = login_check.filter(password=password)
+            if not login_check.exists():
+                return Response({'status':'password-not-correct'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'status':'true'}, status=status.HTTP_200_OK)     
 
 class ListUsersView(APIView):
     def get(self, request):
