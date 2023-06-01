@@ -1,6 +1,8 @@
 <script>
 // element UI setting
 import { ref } from 'vue'
+import md5 from 'js-md5'
+
 const input = ref('')
 import {
   Check,
@@ -19,7 +21,7 @@ export default {
         return {
             uid: '',
             password: '',
-            is_null: false
+            is_null: false,
         }
     },
     methods: {
@@ -28,19 +30,30 @@ export default {
                 this.is_null = true;
                 return;
             }
-            var param = {
+            var params = {
                 'uid': this.uid,
                 'username':this.username,
-                'password':this.password
+                'password':md5(this.password)
             };
-            axios.post('login/', param).then(response => {
-               console.log(response.data)
-            //    if(data['status'] = 'true') {
-                
-            //    }
+            var config = {
+                headers: {
+                    'token': localStorage.getItem('token')
+                }
+            };
+
+            axios.post('login/', params, config)
+                .then(response => {
+                    if(response.data['status'] == 'true') {
+                        localStorage.setItem('token', response.headers['token']);
+                        this.redirect_to_dashboard();
+                    }
+
             }).catch(error => {
                 console.log(error)
             })
+        },
+        redirect_to_dashboard() {
+            this.$router.push({path: '/dashboard', replace: 'true'});
         }
     }
 };

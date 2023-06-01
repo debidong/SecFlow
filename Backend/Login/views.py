@@ -2,11 +2,15 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework.authentication import SessionAuthentication
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.backends.db import SessionStore
 from rest_framework.authtoken.models import Token
 
 from rest_framework.views import APIView
 from .serializer import UserSerializer
 from .models import User
+import jwt
+from django.core.cache import cache
 
 
 class UserView(APIView):
@@ -23,24 +27,31 @@ class UserView(APIView):
             new_user.set_user_info(username=username, password=password, uid=uid)
             new_user.save()
             return Response({'status':'true'},status=status.HTTP_200_OK)
-        
-class SessionView(APIView):
-    # login
+
+# login     
+class TokenView(APIView):
     def post(self, request):
+        # token = request.headers['token']
+        # print(token)
         password = request.data.get('password')
-        uid = request.data.get('uid')
+        uid: str = request.data.get('uid')
         
-        # print(uid)
-        # print(password)
         if not User.check_user_exists(uid):
             return Response({'status':'user-not-exist'}, status=status.HTTP_200_OK)
         else:
             if not User.check_password(uid=uid, password=password):
                 return Response({'status':'password-not-correct'}, status=status.HTTP_200_OK)
             else:
-                resp = Response({'status':'true'}, status=status.HTTP_200_OK)
-                token = Token.objects.create(user=uid)
-                resp.set_cookie('token', token)
+                token = {
+                    'uid': uid, 
+                }
+                token = jwt.encode(token, "secret")
+                headers = {
+                    'token': token,
+                    'access-control-expose-headers': 'token'
+                }
+                cache.add(token, 'logged')
+                resp = Response({'status':'true'}, status=status.HTTP_200_OK, headers=headers)
                 return resp     
 
 class ListUsersView(APIView):

@@ -1,5 +1,6 @@
 <script>
 import axios from 'axios'
+import md5 from 'js-md5'
 axios.defaults.baseURL = 'http://127.0.0.1:8000'
 
 export default {
@@ -17,7 +18,7 @@ export default {
             var reg = {
                 'uid': this.uid,
                 'username':this.username,
-                'password':this.password
+                'password':md5(this.password)
             };
             axios.post('login/register', reg).then(
                 response => {
@@ -39,7 +40,6 @@ export default {
 
 <template>
     <div v-if="status == 'false'">
-        {{ status }}
         <h1>Registration</h1>
         <br>
         <input v-model="uid">Uid
