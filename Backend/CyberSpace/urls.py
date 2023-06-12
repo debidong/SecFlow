@@ -16,11 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from Login.views import ListUsersView
 
 urlpatterns = [
-    # path('login', include('Login.urls')),
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
     path('login/', include('Login.urls')),
-    path('userlist/', ListUsersView.as_view())
+    path('user/dashboard/', include('Chat.urls'))
 ]

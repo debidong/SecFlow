@@ -60,55 +60,56 @@ export default {
 </script>
 
 <template>
-    <div class="page">
-        <el-card class="box-card">
-        <template #header>
-        <div class="card-header">
-            <span>Welcome: {{ uid }}</span>
-            <el-button @click="submit">Login</el-button>
-        </div>
-        </template>
-        <el-input v-model="uid" placeholder="Uid" />
-        <el-input
-        v-model="password"
-        placeholder="Password"
-        show-password/>
-        <el-link v-if="!is_null" type="primary" href="./login/register">Don't have accounts yet?</el-link>
-        <el-text v-if="is_null" type="warning">Uid or password cannot be empty.</el-text>
-        </el-card>
-    </div>
+    <el-container>
+        <el-header>
+            <h1>
+                Login
+            </h1>
+        </el-header>
+        <el-main>
+            <el-card class="box-card">
+                <template #header>
+                <div class="card-header">
+                    <span>Welcome back,<br>
+                        {{ uid }}
+                    </span>
+                </div>
+                </template>
+                <el-input v-model="uid" placeholder="Uid" />
+                <el-input
+                v-model="password"
+                placeholder="Password"
+                show-password/>
+                <div id="submit">
+                    <el-button id="login" type="success" size="large" @click="submit">Login</el-button>
+                    <el-button id="to_register" type="info" size="large" @click="$router.push({path: '/login/register'})">
+                        Don't Have Accounts Yet?
+                    </el-button>
+                </div>
+                <el-text v-if="is_null" type="warning">Uid or password cannot be empty.</el-text>
+            </el-card>
+        </el-main>
+    </el-container>
+    
 </template>
 
 <style scoped>
-.el-link {
-  margin-right: 8px;
-}
-.el-link .el-icon--right.el-icon {
-  vertical-align: text-bottom;
-}
-
-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* .el-button {
+    margin: auto;
+} */
+#submit {
+    margin-top: 5%;
 }
 
-.text {
-  font-size: 14px;
+#to_register {
+    width: 49%;
+    margin: auto;
+    margin-left: 1%;
 }
 
-.item {
-  margin-bottom: 18px;
-}
-
-.box-card {
-    /* width: 480px; */
-    /* width: 50%;
-    height: 50%; */
-    position: absolute;
-}
-
-.page {
-    position: relative;
+#login {
+    width: 49%;
+    margin: auto;
+    margin-right: 1%;
 }
 </style>

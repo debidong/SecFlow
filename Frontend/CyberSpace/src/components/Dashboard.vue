@@ -6,37 +6,217 @@ export default {
         return {
             uid: '',
             username: '',
-            data: {},
-            loaded: false
+            loaded: false,
+
+            reminder: [],
+            to_remind: ''
         }
     },
     methods: {
-        require_get(params) {
-            token = localStorage.getItem('token');
+        require_get(url) {
+            var token = localStorage.getItem('token');
             var config = {
                 headers: {
                     'token': token,
                 }
             };
-            axios.get('basic/', params, config)
-            .then(response => {
-                localStorage.setItem('token', response.response.headers['token']);
-                this.data = response.data;
-            })
+            var _url = 'user/dashboard/' + url;
+            return axios.get(_url, config)
+            .then((response) =>
+                response.data
+            )
         },
+
+        require_post(url, param) {
+            var token = localStorage.getItem('token');
+            var config = {
+                headers: {
+                    'token': token,
+                }
+            };
+            var _url = 'user/dashboard/' + url;
+            return axios.post(_url, param, config).then(
+                (response) => response.data
+            )
+
+        },
+
         get_user_info() {
-            this.require_get({});
-            this.uid = this.data['uid'];
-            this.username = this.data['uid'];
+            this.require_get('info').then((data) => {
+                this.uid = data['uid']; 
+                this.username = data['username'];
+            });
+
+        },
+        get_user_reminder() {
+            this.require_get('reminder').then((data) => {
+                this.reminder = data['reminder'];
+            });
+        },
+        send_remind() {
+            var param = {
+                'topic': this.to_remind
+            }
+            this.require_post('reminder/add', param).
+            then(this.get_user_reminder);
+            this.to_remind = '';
+        },
+        del_remind(i) {
+            var param = {
+                'topic': i
+            };
+            this.require_post('reminder/delete', param).
+            then(this.get_user_reminder);
         }
     },
+
     mounted() {
         this.get_user_info();
+        this.get_user_reminder();
     }
 }
 </script>
 
 
 <template>
-    hi {{ uid }}
+    <el-container>
+        <el-header>
+            <h1>
+                Dashboard
+            </h1>
+        </el-header>
+        <el-main>
+            <el-breadcrumb :separator-icon="ArrowRight">
+            <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/dashboard' }">Dashboard</el-breadcrumb-item>
+            </el-breadcrumb>
+            <el-row :gutter="10">
+                <!-- left column -->
+                <el-col id="left-side" :span="12">
+                    <!-- personal info -->
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Hi {{ username }}</span>
+                        </div>
+                        </template>
+                        <div>
+                            <el-tag size="small">Uid</el-tag> {{ uid }}
+                            <br>
+                            <el-tag size="small">Username</el-tag> {{ username }}
+                        </div>
+                        <!-- <div >
+                            <el-button type="info" size="large" @click="$router.push({path: '/userlist'})">UserList</el-button>
+                        </div> -->
+                    </el-card>
+                    <!-- friends -->
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Friends</span>
+                        </div>
+                        </template>
+                        <div>
+                            pass
+                        </div>
+                    </el-card>
+                    <!-- groups -->
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Groups</span>
+                        </div>
+                        </template>
+                        <div>
+                            pass
+                        </div>
+                    </el-card>
+                </el-col>
+            
+                <!-- right column -->
+                <el-col id="right-side" :span="12">
+                    <!-- inbox -->
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Inbox</span>
+                        </div>
+                        </template>
+                        <div>
+                            Pass
+                        </div>
+                    </el-card>
+                    <!-- reminder -->
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Reminder</span>
+                        </div>
+                        </template>
+                        <div v-for="i in reminder">
+                                {{ i }}
+                            <el-button type="info" size="small" @click="del_remind(i)">Done</el-button>
+                        </div>
+                        <div>
+                            <el-input v-model="to_remind" placeholder="Things to remind" />
+                            <el-button type="info" size="small" @click="send_remind">Add this to reminder</el-button>
+                        </div>
+                    </el-card>
+                    <el-card class="box-card">
+                        <template #header>
+                        <div class="card-header">
+                            <span>Settings</span>
+                        </div>
+                        </template>
+                        <div>
+                            <el-button type="warning" size="medium" @click="logout">Logout</el-button>
+                            <br>
+                            <el-button type="info" size="medium" @click="change_password">Change Password</el-button>
+                            <br>
+                
+                            <el-button type="danger" size="medium" @click="delete_account">Delete Account</el-button>
+                        </div>
+                    </el-card>
+                </el-col>
+            </el-row>            
+        </el-main>
+    </el-container>
+
+    
 </template>
+
+<style scoped>
+.el-header {
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    font-size: x-large;
+    margin-bottom: 10%;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: larger;
+  font-weight: bold;
+}
+
+.left-side {
+    width: 30%;
+    margin: 0;
+    margin-left: 0%;
+    margin-right: 0%;
+}
+
+.right-side {
+    width: 30%;
+    margin: 0;
+    margin-right: 0%;
+    margin-top: 1%; 
+}
+
+.box-card {
+  font-size: large;
+  margin-top: 3%;
+}
+</style>

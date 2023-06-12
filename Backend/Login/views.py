@@ -2,15 +2,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 # from rest_framework.authentication import SessionAuthentication
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.backends.db import SessionStore
-from rest_framework.authtoken.models import Token
 
 from rest_framework.views import APIView
-from .serializer import UserSerializer
 from .models import User
 import jwt
-from django.core.cache import cache
+import utils
 
 
 class UserView(APIView):
@@ -45,18 +41,13 @@ class TokenView(APIView):
                 token = {
                     'uid': uid, 
                 }
-                token = jwt.encode(token, "secret")
+                # token = jwt.encode(token, "secret")
+                token = jwt.encode(token, "secret", algorithm="HS256")
                 headers = {
                     'token': token,
                     'access-control-expose-headers': 'token'
                 }
-                cache.add(token, 'logged')
+                utils.set(uid, 'logged')
                 resp = Response({'status':'true'}, status=status.HTTP_200_OK, headers=headers)
-                return resp     
-
-class ListUsersView(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+                return resp 
     
