@@ -7,7 +7,7 @@ from Login.models import User
 from .models import *
 from .serializer import UserSerializer
 
-# dashboard
+# dashboard 
 class TokenView(APIView):
     # token -> user info
     def get(self, request):
