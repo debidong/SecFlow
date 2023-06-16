@@ -13,8 +13,8 @@ export default defineConfig({
   },
 
   server: {
-    host: true,
+    // host: true,
     // server: '0.0.0.0',
-    port: 4000
+    port: 3306
   }
 })
