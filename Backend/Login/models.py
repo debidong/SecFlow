@@ -10,6 +10,7 @@ class User(models.Model):
     password = models.CharField(max_length=32)
     uid = models.CharField(unique=True, max_length=20)
     salt = models.CharField(max_length=32)
+    friend = models.ManyToManyField('self', symmetrical=False)
 
     def set_user_info(self, username, password, uid):
         self.username = username

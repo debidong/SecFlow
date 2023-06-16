@@ -81,6 +81,30 @@ export default {
             })
         },
 
+
+        agree_friend_request(sender) {
+            var param = {
+                'sender': sender,
+                'anwser': 'agree'
+            };
+            this.require_post('userList/friendRequest/handle', param).then((data) => {
+                this.get_user_inbox();
+                this.get_user_friends();
+            })
+        },
+
+
+        refuse_friend_request(sender) {
+            var param = {
+                'sender': sender,
+                'anwser': 'refuse'
+            };
+            this.require_post('userList/friendRequest/handle', param).then((data) => {
+                this.get_user_inbox();
+                this.get_user_friends();
+            })
+        },
+
         /* Module: Inbox */
         get_user_inbox() {
             this.require_get('inbox').then((data) => {
@@ -139,9 +163,20 @@ export default {
                         </template>
                         <div>
                             <div v-for="i in friends">
-                                {{ i }}
+                                <el-card class="box-card2">
+                                    <template #header>
+                                        <div class="card-header2">
+                                            {{ i.username }}
+                                            <div>
+                                                <el-button type="success">Chat</el-button>
+                                                <el-button type="info">Manage</el-button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <el-tag size="small">Uid</el-tag>{{ i.uid }}<br>
+                                </el-card>
                             <!-- <el-button type="info" size="small" @click="del_remind(i)">Done</el-button> -->
-                        </div>
+                            </div>
                         </div>
                     </el-card>
                     <!-- groups -->
@@ -174,13 +209,13 @@ export default {
                                         <div class="card-header2">
                                             <span>Friend Request</span>
                                             <div>
-                                                <el-button type="success">✔️</el-button>
-                                                <el-button type="danger">✖️</el-button>
+                                                <el-button type="success" @click="agree_friend_request(value)"></el-button>
+                                                <el-button type="danger" @click="refuse_friend_request(value)"></el-button>
                                             </div>
                                         </div>
                                     </template>
-                                    <span>Uid: {{ key }}</span><br>
-                                    <span>Username: {{ value }}</span>                                  
+                                    <span>Uid: {{ value }}</span><br>
+                                    <span>Username: {{ key }}</span>                                  
                                 </el-card>
                             </div>  
                         </div>

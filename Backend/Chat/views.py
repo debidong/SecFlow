@@ -129,11 +129,11 @@ class ListUsersView(APIView):
             return Response(status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
 
 # This class is used to handle the request for friend module.
-class FriendView(APIView):
+class FriendRequestView(APIView):
     def post(self, request):
         # Send friend request to a user by its id.
         if utils.is_loggedin(request):
-            sender_uid = utils.get_user_id(request=request)
+            sender_uid = utils.get_uid_from_token(request=request)
             if sender_uid == request.data.get('user'):
                 # Invaild: User is sending friend request to himself
                 params = {
@@ -159,11 +159,43 @@ class FriendView(APIView):
                     return Response(params, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
+# This class is used to handle the anwser of friend requests.
+class FriendRequestStatusView(APIView):
+    def post(self, request):
+        # Agree or refuse a friend request.
+        # Input: token, anwser(agree or refuse), sender(uid)
+        # Output: None
+        # Status: 200 if the token is valid, 203 if the token is invalid
+        if utils.is_loggedin(request):
+            try:
+                anwser = request.data.get('anwser')
+                print('ssssssssssss')
+                sender = User.objects.get(uid=request.data.get('sender'))
+                print('sssssssss')
+                receiver = utils.get_user_from_token(request)
+                print('ssss')
+                if anwser == 'agree':
+                    FriendRequest.objects.get(sender=sender).delete()
+                    sender.friend.add(receiver)
+                    receiver.friend.add(sender)
+                elif anwser == 'refuse':
+                    
+                    FriendRequest.objects.get(sender=sender).delete()
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_200_OK)
+            except:
+                
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
         
+
 class InboxView(APIView):
     def get(self, request):
         if utils.is_loggedin(request):
-            user = utils.get_user(request=request)
+            user = utils.get_user_from_token(request=request)
 
             friend_requests = FriendRequest.objects.filter(receiver=user)
             requests = {}
@@ -173,6 +205,20 @@ class InboxView(APIView):
                 'inbox': {
                     'friend_requests': requests
                 }
+            }
+            return Response(params, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+
+# This class is used to handle the request for friend module.
+class FriendView(APIView):
+    def get(self, request):
+        if utils.is_loggedin(request):
+            user = utils.get_user_from_token(request=request)
+            friends = user.friend.all()
+            serializer = UserSerializer(friends, many=True)
+            params = {
+                'friends': serializer.data
             }
             return Response(params, status=status.HTTP_200_OK)
         else:

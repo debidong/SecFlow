@@ -27,12 +27,12 @@ def is_loggedin(request) -> bool:
     else:
         return False
     
-def get_user_id(request) -> str:
+def get_uid_from_token(request) -> str:
     token = request.headers['token']
     token = jwt.decode(token, algorithms='HS256', key='secret')
     return token['uid']
 
-def get_user(request) -> User:
+def get_user_from_token(request) -> User:
     token = request.headers['token']
     token = jwt.decode(token, algorithms='HS256', key='secret')
     return User.objects.get(uid=token['uid'])

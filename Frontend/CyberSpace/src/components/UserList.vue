@@ -84,7 +84,7 @@ export default {
         // alert when a friend request is sent
         friend_request_sent(status) {
             if(status == 'true') {
-                this.$message('User not exists!');
+                this.$message('Request sent!');
             } else if(status == 'already sent') {
                 this.$message('Already sent request.')
             } else if(status == 'false') {
@@ -97,7 +97,7 @@ export default {
             var param = {
                 'user': this.users['uid']
             }
-            this.require_post('/friend', param).then((data) => {
+            this.require_post('/friendRequest', param).then((data) => {
                 this.friend_request_sent(data['status']);
             }).catch(error => {
                 this.friend_request_sent(error.response.data['status']);
