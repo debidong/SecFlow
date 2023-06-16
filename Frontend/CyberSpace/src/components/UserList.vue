@@ -6,17 +6,20 @@ export default {
     data() {
         return {
             loaded: false,
-            users: [],
-            found: false,
+            users: [], // returned userList
+            found: false, // if the user is founded
             uid_to_find: ''
+
         }
     },
-    mounted() {
-        if(!this.loaded) {
-            this.get_users();
-        }
-    },
+    // mounted() {
+    //     if(!this.loaded) {
+    //         this.get_users();
+    //     }
+    // },
     methods: {
+        // template for HTTP get
+        // Requested URL: user/dashboard/ + INPUT
         require_get(url) {
             var token = localStorage.getItem('token');
             var config = {
@@ -31,6 +34,8 @@ export default {
             )
         },
 
+        // template for HTTP post
+        // requested URL: user/dashboard/ + INPUT
         require_post(url, param) {
             var token = localStorage.getItem('token');
             var config = {
@@ -38,26 +43,31 @@ export default {
                     'token': token,
                 }
             };
-            var _url = 'user/dashboard/' + url;
+            var _url = 'user/dashboard/userList' + url;
             return axios.post(_url, param, config).then(
                 (response) => response.data
             )
 
         },
-        get_users() {
-            this.require_get('userList').then((data) => {
-                this.users = data['user'];
-            })
-            this.loaded = true;
-        },
+
+        // // get all users in database
+        // get_users() {
+        //     this.require_get('userList').then((data) => {
+        //         this.users = data['user'];
+        //         this.me=data['me'];
+        //     })
+        //     this.loaded = true;
+        // },
+
+        // find a user by its id
         find_user_by_id() {
             var param = {
                 'uid': this.uid_to_find
             };
-
-            this.require_post('userList', param).then((data) => {
+            this.require_post('', param).then((data) => {
                 this.users = data['user'];
                 this.found = true;
+                this.me = data['me'];
             }).catch(error => {
                     this.users = [];
                     this.found = false;
@@ -65,9 +75,34 @@ export default {
                 }
             );
         },
+
+        // alert when cannot find users
         user_not_exist() {
             this.$message('User not exists!');
-        }
+        },
+
+        // alert when a friend request is sent
+        friend_request_sent(status) {
+            if(status == 'true') {
+                this.$message('User not exists!');
+            } else if(status == 'already sent') {
+                this.$message('Already sent request.')
+            } else if(status == 'false') {
+                this.$message('Something went wrong.')
+            }
+        },
+
+        // send a friend request to a user
+        send_friend_request() {
+            var param = {
+                'user': this.users['uid']
+            }
+            this.require_post('/friend', param).then((data) => {
+                this.friend_request_sent(data['status']);
+            }).catch(error => {
+                this.friend_request_sent(error.response.data['status']);
+            })
+        }       
     }
 }
 </script>
@@ -90,18 +125,24 @@ export default {
             <template #header>
             <div class="card-header">
                 <span>Search</span>
+                <div>
+                    <el-button id="search" type="info" size="large" @click="find_user_by_id">Search User</el-button>
+                </div>
             </div>
             </template>
             <div>
                 <el-input id="search-input" v-model="uid_to_find" placeholder="User" />
-                <el-button id="search" type="success" size="large" @click="find_user_by_id">Search</el-button>
             </div>
+            
         </el-card>
 
         <el-card class="box-card" v-if="found">
             <template #header>
             <div class="card-header">
                 <span>Result</span>
+                <div id="add-contact">
+                    <el-button id="add-contact" type="success" size="large" @click="send_friend_request">Add friend</el-button>
+                </div>
             </div>
             </template>
             <div>
@@ -145,14 +186,11 @@ export default {
 .box-card {
   font-size: large;
   margin-top: 3%;
+
 }
 
 #search {
-    width: 20%;
+    /* width: 20%; */
     margin: auto;
 }
-
-/* #search-input {
-    width: 80%;
-} */
 </style>

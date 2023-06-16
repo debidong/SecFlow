@@ -6,5 +6,7 @@ urlpatterns = [
     path('reminder', ReminderView.as_view()),
     path('reminder/add', AddReminderView.as_view()),
     path('reminder/delete', DelReminderView.as_view()),
-    path('userList', ListUsersView.as_view())
+    path('userList', ListUsersView.as_view()),
+    path('userList/friend', FriendView.as_view()),
+    path('inbox', InboxView.as_view()),
 ]

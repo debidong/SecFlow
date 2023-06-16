@@ -9,7 +9,10 @@ export default {
             loaded: false,
 
             reminder: [],
-            to_remind: ''
+            to_remind: '',
+
+            friends: [],
+            inbox: []
         }
     },
     methods: {
@@ -48,6 +51,8 @@ export default {
             });
 
         },
+
+        /* Module: Reminder */
         get_user_reminder() {
             this.require_get('reminder').then((data) => {
                 this.reminder = data['reminder'];
@@ -67,12 +72,28 @@ export default {
             };
             this.require_post('reminder/delete', param).
             then(this.get_user_reminder);
+        },
+
+        /* Module: Friends */
+        get_user_friends() {
+            this.require_get('friends').then((data) => {
+                this.friends = data['friends'];
+            })
+        },
+
+        /* Module: Inbox */
+        get_user_inbox() {
+            this.require_get('inbox').then((data) => {
+                this.inbox = data['inbox'];
+            })
         }
     },
 
     mounted() {
         this.get_user_info();
         this.get_user_reminder();
+        this.get_user_friends();
+        this.get_user_inbox();
     }
 }
 </script>
@@ -94,9 +115,9 @@ export default {
                 <!-- left column -->
                 <el-col id="left-side" :span="12">
                     <!-- personal info -->
-                    <el-card class="box-card">
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Hi {{ username }}</span>
                         </div>
                         </template>
@@ -105,25 +126,28 @@ export default {
                             <br>
                             <el-tag size="small">Username</el-tag> {{ username }}
                         </div>
-                        <!-- <div >
-                            <el-button type="info" size="large" @click="$router.push({path: '/userlist'})">UserList</el-button>
-                        </div> -->
                     </el-card>
-                    <!-- friends -->
-                    <el-card class="box-card">
+                    <!----- FRIENDS ----->
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Friends</span>
+                            <div>
+                                <el-button type="info" size="medium" @click="$router.push({path: '/userlist'})">Find</el-button>
+                            </div>
                         </div>
                         </template>
                         <div>
-                            pass
+                            <div v-for="i in friends">
+                                {{ i }}
+                            <!-- <el-button type="info" size="small" @click="del_remind(i)">Done</el-button> -->
+                        </div>
                         </div>
                     </el-card>
                     <!-- groups -->
-                    <el-card class="box-card">
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Groups</span>
                         </div>
                         </template>
@@ -135,36 +159,55 @@ export default {
             
                 <!-- right column -->
                 <el-col id="right-side" :span="12">
-                    <!-- inbox -->
-                    <el-card class="box-card">
+                    <!----- INBOX ----->
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Inbox</span>
+                            <el-button type="info" size="medium" @click="get_user_inbox">Refresh</el-button>
                         </div>
                         </template>
-                        <div>
-                            Pass
+                        <div v-for="msg in inbox" :key="friend_request">
+                            <div v-for="(key, value) in msg">
+                                <el-card class="box-card2">
+                                    <template #header>
+                                        <div class="card-header2">
+                                            <span>Friend Request</span>
+                                            <div>
+                                                <el-button type="success">✔️</el-button>
+                                                <el-button type="danger">✖️</el-button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <span>Uid: {{ key }}</span><br>
+                                    <span>Username: {{ value }}</span>                                  
+                                </el-card>
+                            </div>  
                         </div>
                     </el-card>
-                    <!-- reminder -->
-                    <el-card class="box-card">
+                    <!----- REMINDER ----->
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Reminder</span>
+                            <el-button type="info" size="medium" @click="send_remind">Add</el-button>
                         </div>
                         </template>
-                        <div v-for="i in reminder">
-                                {{ i }}
-                            <el-button type="info" size="small" @click="del_remind(i)">Done</el-button>
-                        </div>
                         <div>
                             <el-input v-model="to_remind" placeholder="Things to remind" />
-                            <el-button type="info" size="small" @click="send_remind">Add this to reminder</el-button>
+                        </div>
+                        <div v-for="i in reminder">
+                            <el-card class="box-card2">
+                                <span>{{ i }}</span>
+                                <div id="button-on-right">
+                                    <el-button type="success" size="small" @click="del_remind(i)">Done</el-button>
+                                </div>
+                            </el-card>
                         </div>
                     </el-card>
-                    <el-card class="box-card">
+                    <el-card class="box-card1">
                         <template #header>
-                        <div class="card-header">
+                        <div class="card-header1">
                             <span>Settings</span>
                         </div>
                         </template>
@@ -193,12 +236,20 @@ export default {
     font-size: x-large;
     margin-bottom: 10%;
 }
-.card-header {
+.card-header1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: larger;
   font-weight: bold;
+}
+
+.card-header2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: medium;
+    font-weight: bold;
 }
 
 .left-side {
@@ -215,8 +266,19 @@ export default {
     margin-top: 1%; 
 }
 
-.box-card {
-  font-size: large;
-  margin-top: 3%;
+.box-card1 {
+    font-size: large;
+    margin-top: 3%;
+}
+
+.box-card2 {
+    font-size: small;
+    position: relative;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+#button-on-right {
+    float: right;
 }
 </style>

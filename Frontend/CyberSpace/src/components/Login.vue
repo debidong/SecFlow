@@ -4,14 +4,6 @@ import { ref } from 'vue'
 import md5 from 'js-md5'
 
 const input = ref('')
-import {
-  Check,
-  Delete,
-  Edit,
-  Message,
-  Search,
-  Star,
-} from '@element-plus/icons-vue'
 
 import axios from 'axios'
 axios.defaults.baseURL = 'http://127.0.0.1:8000'
