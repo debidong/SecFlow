@@ -4,10 +4,10 @@ This project is a web application which is intended to realize a safe chatroom, 
 
 ## 1.1 Technologies
 
-|   Back-end    |      Front-end      |
-| :-----------: | :-----------------: |
-|    Django     | Vue \| Element Plus |
-| SQLite\|Redis |                     |
+|    Back-end     |      Front-end      |
+| :-------------: | :-----------------: |
+|     Django      | Vue \| Element Plus |
+| SQLite \| Redis |                     |
 
 ## 1.2 Goals
 
