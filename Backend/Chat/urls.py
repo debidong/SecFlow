@@ -3,10 +3,8 @@ from .views import *
 
 # user/dashboard/
 urlpatterns = [
-    path('info', TokenView.as_view()),
+    path('info', InfoView.as_view()),
     path('reminder', ReminderView.as_view()),
-    path('reminder/add', AddReminderView.as_view()),
-    path('reminder/delete', DelReminderView.as_view()),
     path('userList', ListUsersView.as_view()),
     path('userList/friendRequest', FriendRequestView.as_view()),
     path('userList/friendRequest/handle', FriendRequestStatusView.as_view()),

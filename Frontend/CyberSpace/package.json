@@ -16,7 +16,6 @@
     "vue-websocket": "^0.2.3"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.3.5"
+    "@vitejs/plugin-vue": "^4.2.3"
   }
 }

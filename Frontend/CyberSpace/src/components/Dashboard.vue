@@ -31,7 +31,7 @@ export default {
             )
         },
 
-        require_post(url, param) {
+        require_post(url, paramss) {
             var token = localStorage.getItem('token');
             var config = {
                 headers: {
@@ -39,7 +39,7 @@ export default {
                 }
             };
             var _url = 'user/dashboard/' + url;
-            return axios.post(_url, param, config).then(
+            return axios.post(_url, paramss, config).then(
                 (response) => response.data
             )
 
@@ -60,18 +60,18 @@ export default {
             });
         },
         send_remind() {
-            var param = {
+            var params = {
                 'topic': this.to_remind
             }
-            this.require_post('reminder/add', param).
+            this.require_post('reminder/add', params).
             then(this.get_user_reminder);
             this.to_remind = '';
         },
         del_remind(i) {
-            var param = {
+            var params = {
                 'topic': i
             };
-            this.require_post('reminder/delete', param).
+            this.require_post('reminder/delete', params).
             then(this.get_user_reminder);
         },
 
@@ -84,11 +84,11 @@ export default {
 
 
         agree_friend_request(sender) {
-            var param = {
+            var params = {
                 'sender': sender,
                 'anwser': 'agree'
             };
-            this.require_post('userList/friendRequest/handle', param).then((data) => {
+            this.require_post('userList/friendRequest/handle', params).then((data) => {
                 this.get_user_inbox();
                 this.get_user_friends();
             })
@@ -96,11 +96,11 @@ export default {
 
 
         refuse_friend_request(sender) {
-            var param = {
+            var params = {
                 'sender': sender,
                 'anwser': 'refuse'
             };
-            this.require_post('userList/friendRequest/handle', param).then((data) => {
+            this.require_post('userList/friendRequest/handle', params).then((data) => {
                 this.get_user_inbox();
                 this.get_user_friends();
             })
