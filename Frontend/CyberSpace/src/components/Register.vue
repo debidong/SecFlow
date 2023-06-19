@@ -1,7 +1,7 @@
 <script>
 import axios from 'axios'
 import md5 from 'js-md5'
-axios.defaults.baseURL = 'http://127.0.0.1:8000'
+// axios.defaults.baseURL = 'http://0.0.0.0:8000'
 
 export default {
     data() {
@@ -20,7 +20,7 @@ export default {
                 'username':this.username,
                 'password':md5(this.password)
             };
-            axios.post('login/register', reg).then(
+            axios.post('api/accounts/register', reg).then(
                 response => {
                     if(response.data['status'] == 'occupied') {
                         this.is_occupied = 'true';

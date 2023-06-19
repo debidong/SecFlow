@@ -1,6 +1,5 @@
 <script>
 import axios from 'axios';
-axios.defaults.baseURL = 'http://127.0.0.1:8000'
 
 export default {
     data() {
@@ -9,44 +8,45 @@ export default {
             username: '',
             loaded: false,
 
+            // Reminder module
             reminder: [],
-            to_remind: '',
+            topic: '',
 
             friends: [],
             inbox: []
         }
     },
     methods: {
-        require_get(url) {
+        requireGET(url) {
             var token = localStorage.getItem('token');
             var config = {
                 headers: {
                     'token': token,
                 }
             };
-            var _url = 'user/dashboard/' + url;
+            var _url = 'api/user/dashboard/' + url;
             return axios.get(_url, config)
             .then((response) =>
                 response.data
             )
         },
 
-        require_post(url, paramss) {
+        requirePOST(url, paramss) {
             var token = localStorage.getItem('token');
             var config = {
                 headers: {
                     'token': token,
                 }
             };
-            var _url = 'user/dashboard/' + url;
+            var _url = 'api/user/dashboard/' + url;
             return axios.post(_url, paramss, config).then(
                 (response) => response.data
             )
 
         },
 
-        get_user_info() {
-            this.require_get('info').then((data) => {
+        getUserInfo() {
+            this.requireGET('info').then((data) => {
                 this.uid = data['uid']; 
                 this.username = data['username'];
             });
@@ -54,71 +54,56 @@ export default {
         },
 
         /* Module: Reminder */
-        get_user_reminder() {
-            this.require_get('reminder').then((data) => {
+        getUserReminder() {
+            this.requireGET('reminder').then((data) => {
                 this.reminder = data['reminder'];
             });
         },
-        send_remind() {
+        handleReminder(topic, action) {
             var params = {
-                'topic': this.to_remind
+                'topic': topic,
+                'action': action
             }
-            this.require_post('reminder/add', params).
-            then(this.get_user_reminder);
-            this.to_remind = '';
-        },
-        del_remind(i) {
-            var params = {
-                'topic': i
-            };
-            this.require_post('reminder/delete', params).
-            then(this.get_user_reminder);
+            this.requirePOST('reminder', params).then((data) => {
+                if(action == 'add') {
+                    this.topic = '';
+                }
+                this.getUserReminder();
+            })
         },
 
         /* Module: Friends */
-        get_user_friends() {
-            this.require_get('friends').then((data) => {
+        getUserFriends() {
+            this.requireGET('friends').then((data) => {
                 this.friends = data['friends'];
             })
         },
 
 
-        agree_friend_request(sender) {
+        handleFriendRequest(sender, anwser) {
             var params = {
                 'sender': sender,
-                'anwser': 'agree'
+                'anwser': anwser
             };
-            this.require_post('userList/friendRequest/handle', params).then((data) => {
-                this.get_user_inbox();
-                this.get_user_friends();
-            })
-        },
-
-
-        refuse_friend_request(sender) {
-            var params = {
-                'sender': sender,
-                'anwser': 'refuse'
-            };
-            this.require_post('userList/friendRequest/handle', params).then((data) => {
-                this.get_user_inbox();
-                this.get_user_friends();
+            this.requirePOST('userList/friendRequest/handle', params).then((data) => {
+                this.getUserInbox();
+                this.getUserFriends();
             })
         },
 
         /* Module: Inbox */
-        get_user_inbox() {
-            this.require_get('inbox').then((data) => {
+        getUserInbox() {
+            this.requireGET('inbox').then((data) => {
                 this.inbox = data['inbox'];
             })
         }
     },
 
     mounted() {
-        this.get_user_info();
-        this.get_user_reminder();
-        this.get_user_friends();
-        this.get_user_inbox();
+        this.getUserInfo();
+        this.getUserReminder();
+        this.getUserFriends();
+        this.getUserInbox();
     }
 }
 </script>
@@ -200,7 +185,7 @@ export default {
                         <template #header>
                         <div class="card-header1">
                             <span>Inbox</span>
-                            <el-button type="info" size="medium" @click="get_user_inbox">Refresh</el-button>
+                            <el-button type="info" size="medium" @click="getUserInbox">Refresh</el-button>
                         </div>
                         </template>
                         <div v-for="msg in inbox" :key="friend_request">
@@ -210,8 +195,8 @@ export default {
                                         <div class="card-header2">
                                             <span>Friend Request</span>
                                             <div>
-                                                <el-button type="success" @click="agree_friend_request(value)"></el-button>
-                                                <el-button type="danger" @click="refuse_friend_request(value)"></el-button>
+                                                <el-button type="success" @click="handleFriendRequest(value, 'agree')"></el-button>
+                                                <el-button type="danger" @click="handleFriendRequest(value), 'refuse'"></el-button>
                                             </div>
                                         </div>
                                     </template>
@@ -226,17 +211,17 @@ export default {
                         <template #header>
                         <div class="card-header1">
                             <span>Reminder</span>
-                            <el-button type="info" size="medium" @click="send_remind">Add</el-button>
+                            <el-button type="info" size="medium" @click="handleReminder(this.topic, 'add')">Add</el-button>
                         </div>
                         </template>
                         <div>
-                            <el-input v-model="to_remind" placeholder="Things to remind" />
+                            <el-input v-model="topic" placeholder="Things to remind" />
                         </div>
                         <div v-for="i in reminder">
                             <el-card class="box-card2">
                                 <span>{{ i }}</span>
                                 <div id="button-on-right">
-                                    <el-button type="success" size="small" @click="del_remind(i)">Done</el-button>
+                                    <el-button type="success" size="small" @click="handleReminder(i, 'delete')">Done</el-button>
                                 </div>
                             </el-card>
                         </div>

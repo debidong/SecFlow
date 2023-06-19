@@ -6,7 +6,6 @@ import md5 from 'js-md5'
 const input = ref('')
 
 import axios from 'axios'
-axios.defaults.baseURL = 'http://127.0.0.1:8000'
 
 export default {
     data() {
@@ -33,7 +32,7 @@ export default {
                 }
             };
 
-            axios.post('login/', params, config)
+            axios.post('api/accounts/', params, config)
                 .then(response => {
                     if(response.data['status'] == 'true') {
                         localStorage.setItem('token', response.headers['token']);
