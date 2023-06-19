@@ -54,9 +54,11 @@ class ReminderView(APIView):
         try:
             if utils.is_loggedin(request):
                 topic = request.data.get('topic')
+                print(topic)
                 user = utils.get_user_from_token(request)
                 action = request.data.get('action')
                 if action == 'add':
+                    assert topic != None
                     reminder = Reminder(topic=topic, user=user)
                     reminder.save()
                     return Response(status=status.HTTP_200_OK)
