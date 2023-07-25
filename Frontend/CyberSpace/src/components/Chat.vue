@@ -13,7 +13,9 @@ export default {
             rid: '',
             secretKey: '',
             isChecked: false,
-            websocket: null
+            websocket: null,
+            msg: '',
+            chatHistory: 'Why not say something?'
         }
     },
     methods: {
@@ -38,8 +40,8 @@ export default {
         },
         connWS() {
             if(this.websocket == null) {
-                this.websocket = new WebSocket('ws://localhost:8000/api/chat')
-                this.$message('Joined in chatroom!')
+                this.websocket = new WebSocket('ws://localhost:8000/api/chat/?rid=' + this.rid)
+                this.$message('Joined in chatroom ' + this.rid + '!')
             } else {
                 this.$message('Already in chatroom!');
             }
@@ -66,6 +68,18 @@ export default {
             }).catch((error) => {
                 this.$message('Chatroom already been deleted!');
             })
+        },
+
+        sendMsg() {
+            let params = {
+                'myUid': this.myUid,
+                'time': Date.now(),
+                'content': this.msg,
+                'rid': this.rid
+            };
+
+            this.websocket.send(JSON.stringify(params))
+            this.msg = '';
         }
     }, mounted() {
         this.initialize();
@@ -88,7 +102,17 @@ export default {
                 <el-button type="danger" @click="delRoom">Delete Chatroom</el-button>
             </el-aside>
             <el-main>
-                
+                <el-card>
+                    <el-scrollbar height="100px">
+                        {{this.chatHistory}}
+                    </el-scrollbar>
+                </el-card>
+                <el-input
+                type="textarea"
+                :rows="5"
+                v-model="msg"
+                placeholder="Message here"/>
+                <el-button type="info" @click="sendMsg">Send</el-button>
             </el-main>
         </el-container>
     </el-container>

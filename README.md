@@ -28,11 +28,25 @@ This project is still under developing, and here are all to-dos I've planned.
 
 # 2 Running this project
 
+## 2.1 Installing Dependencies
+
+Installing `daphne` is a must, otherwise `python manage.py runserver` may not respond.
+
+Run
+
+```bash
+pip install daphne
+```
+
+## 2.2 Running Django & Vue & Nginx separately
+
 1. In `/CyberSpace/Backend` run
 
     ```bash
     python manage.py runserver
     ```
+
+    If you come across error like `FoundError: No module named 'channels'`, you may use `pip install channels` to install such package.
 
 2. In `/CyberSpace/Backend/Redis-x64-5.0.14.1` run
 
@@ -47,5 +61,5 @@ This project is still under developing, and here are all to-dos I've planned.
    # or, for developing
    npm run dev
    ```
-   
+
 
