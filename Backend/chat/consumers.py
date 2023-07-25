@@ -1,13 +1,38 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.generic.websocket import WebsocketConsumer
+import json
+from .models import Message
 
-class ChatConsumer(WebsocketConsumer):
-    def connect(self):
-        self.accept()
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        query_string = self.scope['query_string'].decode()
+        params = dict(param.split('=') for param in query_string.split('&'))
+        rid = params.get('rid')
+        print(rid)
+        
 
     def disconnect(self, close_code):
         self.close()
-    
+
+    def receive(self, text_data):
+    # 处理接收到的消息
+        params = json.loads(text_data)
+        print(params['msg'])
+        rid = params['rid']
+        content = params['content']
+        time = params['time']
+        myUid = params['myUid']
+        
+        self.send(text_data=json.dumps({
+            
+        }))
+
+    async def chat_message(self, event):
+        # 发送消息给客户端
+        message = event['message']
+
+        await self.send(text_data=message)
 
 # class ChatConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):
