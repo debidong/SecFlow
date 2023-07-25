@@ -19,7 +19,7 @@ This project is still under developing, and here are all to-dos I've planned.
 - [x] Reminder
 - [ ] Detailed personal bio
 - [x] User search/ Add friend
-- [ ] Friend list
+- [x] Friend list
 - [ ] Group search/ Group list
 - [ ] Group list
 - [ ] Chatroom
