@@ -1,11 +1,15 @@
 <script>
-import Login from './components/Login.vue'
-import UserList from './components/UserList.vue'
+import Login from './components/Login.vue';
+import UserList from './components/UserList.vue';
+import Register from './components/Register.vue';
+import Chat from './components/Chat.vue';
 
 export default {
   components: {
     Login,
-    UserList
+    UserList,
+    Register,
+    Chat
   }
 }
 </script>

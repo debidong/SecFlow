@@ -1,7 +1,6 @@
 <script>
 import axios from 'axios'
 import md5 from 'js-md5'
-// axios.defaults.baseURL = 'http://0.0.0.0:8000'
 
 export default {
     data() {
@@ -39,30 +38,53 @@ export default {
 
 
 <template>
-    <div v-if="status == 'false'">
-        <h1>Registration</h1>
-        <br>
-        <input v-model="uid">Uid
-        <br>
-        <input v-model="username">Username
-        <br>
-        <input v-model="password">Password
-        <br>
-        <span v-if="is_occupied=='true'">Uid occupied!</span>
-        <button @click="register">Submit</button>
-    </div>
-    <div v-else-if="status == 'true'">
-        {{ status }}
-        <h1>Registration succeeded.</h1>
-        Your uid: {{ uid }}
-        <br>
-        Your username: {{ username }}
-        <br>
-        Your password: {{ password }}
-        <br>
-        Keep that in mind.
-        <router-link to="/login">Login</router-link>
-    </div>
+    <el-container>
+        <div v-if="status == 'false'">
+            <el-header>
+                <h1>
+                    Registration
+                </h1>
+            </el-header>
+            <el-main>
+                <el-card class="box-card">
+                    <template #header>
+                        <div class="card-header">
+                        <span>Welcome,<br>
+                        {{ uid }}
+                        </span>
+                        </div>
+                    </template>
+                    <el-input v-model="uid" placeholder="Uid" />
+                    <el-input v-model="username" placeholder="Username" />
+                    <el-input v-model="password" placeholder="Password" />
+                    <span v-if="is_occupied=='true'">Uid occupied!</span>
+                    <el-button id="login" type="success" size="large" @click="register">Submit</el-button>
+                </el-card>
+            </el-main>
+        </div>
 
-
+        <div v-else-if="status == 'true'">
+            <el-card>
+                <template #header>
+                    Registration succeeded.
+                </template>
+                <div>
+                    Your uid: {{ uid }}
+                <br>
+                    Your username: {{ username }}
+                <br>
+                    Keep that in mind.
+                </div>
+            </el-card>
+            <el-button id="to_login" type="success" size="large" @click="$router.push({path: '/login'})">
+                    Login
+            </el-button>
+        </div>
+    </el-container>
 </template>
+
+<style scoped>
+
+
+
+</style>

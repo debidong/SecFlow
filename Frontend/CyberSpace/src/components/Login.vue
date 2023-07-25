@@ -73,7 +73,7 @@ export default {
                 show-password/>
                 <div id="submit">
                     <el-button id="login" type="success" size="large" @click="submit">Login</el-button>
-                    <el-button id="to_register" type="info" size="large" @click="$router.push({path: '/login/register'})">
+                    <el-button id="to_register" type="info" size="large" @click="$router.push({path: '/register'})">
                         Don't Have Accounts Yet?
                     </el-button>
                 </div>
@@ -85,9 +85,7 @@ export default {
 </template>
 
 <style scoped>
-/* .el-button {
-    margin: auto;
-} */
+
 #submit {
     margin-top: 5%;
 }

@@ -4,6 +4,7 @@ import Index from '@/components/Index.vue'
 import UserList from '@/components/userList.vue'
 import Register from '@/components/Register.vue'
 import Dashboard from '@/components/DashBoard.vue'
+import Chat from '@/components/Chat.vue'
 
 
 const routes = [{
@@ -19,13 +20,17 @@ const routes = [{
         name: 'UserList',
         component: UserList
     }, {
-        path: '/login/register',
+        path: '/register',
         name: 'Register',
         component: Register
     }, {
         path: '/dashboard',
         name: 'dashboard',
         component: Dashboard
+    }, {
+        path: '/chat',
+        name: 'chat',
+        component: Chat
     }
 ]
 

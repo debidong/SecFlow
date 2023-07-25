@@ -31,7 +31,7 @@ export default {
             )
         },
 
-        requirePOST(url, paramss) {
+        requirePOST(url, params) {
             var token = localStorage.getItem('token');
             var config = {
                 headers: {
@@ -39,7 +39,7 @@ export default {
                 }
             };
             var _url = 'api/user/dashboard/' + url;
-            return axios.post(_url, paramss, config).then(
+            return axios.post(_url, params, config).then(
                 (response) => response.data
             )
 
@@ -96,6 +96,34 @@ export default {
             this.requireGET('inbox').then((data) => {
                 this.inbox = data['inbox'];
             })
+        },
+
+
+        goToChatroom(uid, username) {
+            let token = localStorage.getItem('token');
+            let params = {
+                'myUid': this.uid,
+                'myUsername': this.username,
+                'uid': uid,
+                'username': username
+            };
+            let config = {
+                headers: {
+                    'token': token,
+                }
+            };
+            axios.post('api/chat/chatroom', params, config).then((response) => {
+                    let params = {
+                        'myUid': this.uid,
+                        'myUsername': this.username,
+                        'uid': uid,
+                        'username': username,
+                        'rid': response.data['rid']
+                    };
+
+                    this.$store.commit('setRoomInfo', params);
+                    this.$router.push('/chat');
+                })
         }
     },
 
@@ -154,7 +182,7 @@ export default {
                                         <div class="card-header2">
                                             {{ i.username }}
                                             <div>
-                                                <el-button type="success">Chat</el-button>
+                                                <el-button type="success" @click="goToChatroom(i.username, i.uid)">Chat</el-button>
                                                 <el-button type="info">Manage</el-button>
                                             </div>
                                         </div>

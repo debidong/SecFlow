@@ -27,7 +27,7 @@ export default {
                     'token': token,
                 }
             };
-            var _url = 'user/dashboard/' + url;
+            var _url = 'api/user/dashboard/' + url;
             return axios.get(_url, config)
             .then((response) =>
                 response.data
@@ -43,7 +43,7 @@ export default {
                     'token': token,
                 }
             };
-            var _url = 'user/dashboard/userList' + url;
+            var _url = 'api/user/dashboard/userList' + url;
             return axios.post(_url, param, config).then(
                 (response) => response.data
             )

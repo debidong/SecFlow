@@ -50,4 +50,5 @@ class TokenView(APIView):
                 utils.set(uid, 'logged')
                 resp = Response({'status':'true'}, status=status.HTTP_200_OK, headers=headers)
                 return resp 
-    
+
+
