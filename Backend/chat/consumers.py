@@ -1,7 +1,9 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.generic.websocket import WebsocketConsumer
 import json
-from .models import Message
+from .models import *
+from accounts.models import User
+from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -15,18 +17,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def disconnect(self, close_code):
         self.close()
 
-    def receive(self, text_data):
-    # 处理接收到的消息
+    # Handle the message
+    async def receive(self, text_data):
+        await self.send(text_data=json.dumps(text_data))
         params = json.loads(text_data)
-        print(params['msg'])
+        print(params['content'])
         rid = params['rid']
         content = params['content']
         time = params['time']
         myUid = params['myUid']
         
-        self.send(text_data=json.dumps({
-            
-        }))
+        user = await self.get_user(myUid)
+        await self.save_message(user, rid, content, time)
 
     async def chat_message(self, event):
         # 发送消息给客户端
@@ -67,3 +69,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 #         message = event['message']
 
 #         await self.send(text_data=message)
+
+    @database_sync_to_async
+    def save_message(self, user, rid, content, time):
+        room = Room.objects.get(rid=rid)
+        message = Message(user=user, room=room, content=content, time=time)
+        message.save()
+
+    @database_sync_to_async
+    def get_user(self, myUid):
+        return User.objects.get(uid=myUid)
