@@ -15,7 +15,7 @@ export default {
             isChecked: false,
             websocket: null,
             msg: '',
-            chatHistory: 'Why not say something?'
+            chatHistory: []
         }
     },
     methods: {
@@ -45,6 +45,16 @@ export default {
             } else {
                 this.$message('Already in chatroom!');
             }
+            this.websocket.addEventListener('message', (event) => {
+                let msg = JSON.parse(event.data) // typeof(msg) = string
+                console.log(typeof(msg))
+                let params = {
+                    'sender': msg.myUid,
+                    'time': msg.time,
+                    'content': msg.content
+                }
+                this.chatHistory.push(params)
+            })
         },
         disconnWS() {
             if(this.websocket == null) {
@@ -84,6 +94,8 @@ export default {
     }, mounted() {
         this.initialize();
         this.connWS();
+    }, beforeUnmount() {
+        this.websocket.close()
     }
 }
 
@@ -91,29 +103,86 @@ export default {
 
 <template>
     <el-container>
-        <el-header>
-            Chatroom
+        <el-header class="el-header">
+            <h1>
+                Chatroom
+            </h1>
+            <el-breadcrumb :separator-icon="ArrowRight">
+            <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/dashboard' }">Dashboard</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/chat' }">Chat</el-breadcrumb-item>
+            </el-breadcrumb>
         </el-header>
         <el-container>
-            <el-aside>
-                You are chatting with {{ this.username }}
-                <el-button type="warning" @click="disconnWS">Close Connection</el-button>
-                <el-button type="success" @click="connWS">Connect</el-button>
-                <el-button type="danger" @click="delRoom">Delete Chatroom</el-button>
-            </el-aside>
             <el-main>
-                <el-card>
-                    <el-scrollbar height="100px">
-                        {{this.chatHistory}}
+                <!-- message box -->
+                <div>
+                    <el-card>
+                    <el-scrollbar height="500px">
+                        <el-card v-for="(msg, index) in chatHistory" :key="index">
+                            <template #header>
+                                {{ msg.sender }} @ {{ msg.time }}
+                            </template>
+                            {{ msg.content }}
+                        </el-card>
                     </el-scrollbar>
-                </el-card>
-                <el-input
-                type="textarea"
-                :rows="5"
-                v-model="msg"
-                placeholder="Message here"/>
-                <el-button type="info" @click="sendMsg">Send</el-button>
+                    </el-card>
+                </div>
             </el-main>
+            <el-aside>
+                <div class="aside">
+                    <el-card>
+                        <template #header>
+                            {{ this.username }}
+                        </template>
+                        <el-button type="warning" size="large" @click="disconnWS" id="button">Close Connection</el-button><br>
+                        <el-button type="success" size="large" @click="connWS" id="button">Reconnect</el-button><br>
+                        <el-button type="danger" size="large" @click="delRoom" id="button">Delete Chatroom</el-button><br>
+                    </el-card>
+                    <el-card>
+                        <div class="inside-card">
+                            <el-input
+                            type="textarea"
+                            :rows="3"
+                            v-model="msg"
+                            @keyup.enter.native="sendMsg"
+                            placeholder=""/>
+                        </div>
+                        <div >
+                            <el-button type="info" @click="sendMsg" id="button" size="default">Send</el-button>
+                        </div>
+                    </el-card>
+                    
+                </div>
+            </el-aside>
         </el-container>
     </el-container>
 </template>
+
+<style scoped>
+
+.el-header {
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    font-size: x-large;
+    margin-bottom: 10%;
+}
+
+.aside {
+    margin-left: 5%;
+    text-align: center;
+    font-size: large;
+}
+
+#button {
+    width: 100%;
+    margin: auto;
+    margin-bottom: 1%;
+}
+
+.inside-card {
+    margin-bottom: 5%;
+}
+
+</style>
