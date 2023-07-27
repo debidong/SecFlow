@@ -15,8 +15,6 @@ class Room(models.Model):
         self.users.remove(user)
         self.save()
 
-    def __str__(self):
-        pass
 
 class Message(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)

@@ -38,6 +38,32 @@ export default {
             this.username = this.$store.state.username;
             this.rid=this.$store.state.rid;
         },
+        handleMsg() {
+            let isFirstCall = true;
+
+            const saveToLocal = (msg) => {
+                if (isFirstCall) {
+                    console.log('here')
+                    msg.forEach(params => {
+                        this.chatHistory.push({
+                            'sender': params.myUid,
+                            'time': params.time,
+                            'content': params.content
+                        })
+                    })
+                    isFirstCall = false;
+                } else {
+                    this.chatHistory.push({
+                    'sender': msg.myUid,
+                    'time': msg.time,
+                    'content': msg.content
+                    })
+                }
+                
+            }
+            console.log(isFirstCall)
+            return saveToLocal
+        },
         connWS() {
             if(this.websocket == null) {
                 this.websocket = new WebSocket('ws://localhost:8000/api/chat/?rid=' + this.rid)
@@ -45,15 +71,11 @@ export default {
             } else {
                 this.$message('Already in chatroom!');
             }
+            let handleMsg = this.handleMsg()
             this.websocket.addEventListener('message', (event) => {
                 let msg = JSON.parse(event.data) // typeof(msg) = string
-                console.log(typeof(msg))
-                let params = {
-                    'sender': msg.myUid,
-                    'time': msg.time,
-                    'content': msg.content
-                }
-                this.chatHistory.push(params)
+                handleMsg(msg)
+                
             })
         },
         disconnWS() {

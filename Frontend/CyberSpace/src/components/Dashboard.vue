@@ -171,7 +171,7 @@ export default {
                         <div class="card-header1">
                             <span>Friends</span>
                             <div>
-                                <el-button type="info" size="medium" @click="$router.push({path: '/userlist'})">Find</el-button>
+                                <el-button size="medium" @click="$router.push({path: '/userlist'})" text>Find</el-button>
                             </div>
                         </div>
                         </template>
@@ -213,7 +213,7 @@ export default {
                         <template #header>
                         <div class="card-header1">
                             <span>Inbox</span>
-                            <el-button type="info" size="medium" @click="getUserInbox">Refresh</el-button>
+                            <el-button size="medium" @click="getUserInbox" text>Refresh</el-button>
                         </div>
                         </template>
                         <div v-for="msg in inbox" :key="friend_request">
@@ -223,8 +223,9 @@ export default {
                                         <div class="card-header2">
                                             <span>Friend Request</span>
                                             <div>
-                                                <el-button type="success" @click="handleFriendRequest(value, 'agree')"></el-button>
-                                                <el-button type="danger" @click="handleFriendRequest(value), 'refuse'"></el-button>
+                                                    <el-button type="success" @click="handleFriendRequest(value, 'agree')">Agree</el-button>
+                                                    <el-button type="danger" @click="handleFriendRequest(value), 'refuse'">Reject</el-button>
+                                                
                                             </div>
                                         </div>
                                     </template>
@@ -239,7 +240,7 @@ export default {
                         <template #header>
                         <div class="card-header1">
                             <span>Reminder</span>
-                            <el-button type="info" size="medium" @click="handleReminder(this.topic, 'add')">Add</el-button>
+                            <el-button size="medium" @click="handleReminder(this.topic, 'add')" text>Add</el-button>
                         </div>
                         </template>
                         <div>
