@@ -7,75 +7,85 @@ from channels.db import database_sync_to_async
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        await self.accept()
+        
         query_string = self.scope['query_string'].decode()
         params = dict(param.split('=') for param in query_string.split('&'))
         rid = params.get('rid')
         print(rid)
+        chat_history = await self.get_chat_history(rid)
+        print(chat_history)
+        self.room_group_name = rid
+        await self.accept()
+        await self.send(text_data=chat_history)
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        
         
 
-    def disconnect(self, close_code):
-        self.close()
+        
 
-    # Handle the message
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.close()
+
+    # Handle message
     async def receive(self, text_data):
-        await self.send(text_data=json.dumps(text_data))
+        # await self.send(text_data=json.dumps(text_data))
         params = json.loads(text_data)
         print(params['content'])
+
         rid = params['rid']
         content = params['content']
-        time = params['time']
+        time = ""
         myUid = params['myUid']
         
-        user = await self.get_user(myUid)
-        await self.save_message(user, rid, content, time)
+        # users = await self.get_user(rid)
+        time = await self.save_message(myUid, rid, content)
+        message = {
+            'rid': rid,
+            'content': content,
+            'time': time,
+            'myUid': myUid
+        }
 
-    async def chat_message(self, event):
-        # 发送消息给客户端
+        await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'broadcast',
+            'message': message,
+        })
+
+
+    # Send message to room group
+    async def broadcast(self, event):
         message = event['message']
-
-        await self.send(text_data=message)
-
-# class ChatConsumer(AsyncWebsocketConsumer):
-#     async def connect(self):
-#         self.room_name = self.scope['url_route']['kwargs']['room_name']
-#         self.room_group_name = 'chat_%s' % self.room_name
-
-#         await self.channel_layer.group_add(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#         await self.accept()
-
-#     async def disconnect(self, close_code):
-#         await self.channel_layer.group_discard(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#     async def receive(self, text_data):
-#         # 处理接收到的消息
-#         await self.channel_layer.group_send(
-#             self.room_group_name,
-#             {
-#                 'type': 'chat_message',
-#                 'message': text_data
-#             }
-#         )
-
-#     async def chat_message(self, event):
-#         # 发送消息给客户端
-#         message = event['message']
-
-#         await self.send(text_data=message)
+        await self.send(text_data=json.dumps(message))
 
     @database_sync_to_async
-    def save_message(self, user, rid, content, time):
+    def save_message(self, myUid, rid, content) -> str:
         room = Room.objects.get(rid=rid)
-        message = Message(user=user, room=room, content=content, time=time)
+        me = User.objects.get(uid=myUid)
+        message = Message(user=me, room=room, content=content, time="")
         message.save()
+        return message.time.strftime("%Y-%m-%d %H:%M:%S")
 
     @database_sync_to_async
-    def get_user(self, myUid):
-        return User.objects.get(uid=myUid)
+    def get_user(self, rid) -> list:
+        room = Room.objects.get(rid=rid)
+        users = room.users.all()
+
+        ret = []
+        for user in users:
+            ret.append(user)
+        return ret
+    
+    @database_sync_to_async
+    def get_chat_history(self, rid) -> str:
+        room = Room.objects.get(rid=rid)
+        msgs = Message.objects.filter(room=room).order_by('time')
+        chat_history = []
+        for msg in msgs:
+            temp = {
+                'uid': msg.user.uid,
+                'content': msg.content,
+                'time': msg.time.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            chat_history.append(temp)
+        return json.dumps(chat_history)
