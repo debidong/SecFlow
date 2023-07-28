@@ -43,10 +43,9 @@ export default {
 
             const saveToLocal = (msg) => {
                 if (isFirstCall) {
-                    console.log('here')
                     msg.forEach(params => {
                         this.chatHistory.push({
-                            'sender': params.myUid,
+                            'sender': params.uid,
                             'time': params.time,
                             'content': params.content
                         })
@@ -54,14 +53,13 @@ export default {
                     isFirstCall = false;
                 } else {
                     this.chatHistory.push({
-                    'sender': msg.myUid,
+                    'sender': msg.uid,
                     'time': msg.time,
                     'content': msg.content
                     })
                 }
                 
             }
-            console.log(isFirstCall)
             return saveToLocal
         },
         connWS() {
@@ -75,7 +73,6 @@ export default {
             this.websocket.addEventListener('message', (event) => {
                 let msg = JSON.parse(event.data) // typeof(msg) = string
                 handleMsg(msg)
-                
             })
         },
         disconnWS() {
@@ -141,12 +138,10 @@ export default {
                 <div>
                     <el-card>
                     <el-scrollbar height="500px">
-                        <el-card v-for="(msg, index) in chatHistory" :key="index">
-                            <template #header>
-                                {{ msg.sender }} @ {{ msg.time }}
-                            </template>
-                            {{ msg.content }}
-                        </el-card>
+                        <div v-for="(msg, index) in chatHistory" :key="index">
+                            <el-divider content-position="left">{{ msg.sender }} @ {{ msg.time }}</el-divider>
+                            <span>{{ msg.content }}</span>
+                        </div>
                     </el-scrollbar>
                     </el-card>
                 </div>
@@ -155,7 +150,8 @@ export default {
                 <div class="aside">
                     <el-card>
                         <template #header>
-                            {{ this.username }}
+                            {{ this.username }}<br>
+                            <el-text tag="i" type="success">Chatroom {{ this.rid }}</el-text>
                         </template>
                         <el-button type="warning" size="large" @click="disconnWS" id="button">Close Connection</el-button><br>
                         <el-button type="success" size="large" @click="connWS" id="button">Reconnect</el-button><br>

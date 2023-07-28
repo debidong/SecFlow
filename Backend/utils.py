@@ -19,6 +19,7 @@ def exists(key:str):
 def keys():
     return redis_client.keys('*')
 
+# DEPRECATED
 def is_loggedin(request) -> bool:
     token = request.headers['token']
     token = jwt.decode(token, algorithms='HS256', key='secret')

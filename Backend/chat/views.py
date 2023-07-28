@@ -21,6 +21,7 @@ class RoomIdView(APIView):
         me = User.objects.get(uid=request.data.get('myUid'))
         room = Room.objects.filter(users=friend).filter(users=me)
         if room.exists():
+            room = room.get()
             params = {
                 'rid': room.rid,
             }
