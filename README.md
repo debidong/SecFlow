@@ -62,4 +62,3 @@ pip install daphne
    npm run dev
    ```
 
-

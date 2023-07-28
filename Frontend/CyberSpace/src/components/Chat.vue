@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 
+
 export default {
     data() {
         return {
@@ -19,18 +20,14 @@ export default {
         }
     },
     methods: {
-        // checkSKey() {
-        //     params = {
-        //         'secretKey': this.secretKey
-        //     }
-        //     axios.post('api/chat/check', data=params).then(
-        //         response => {
-        //             if(response.data['status'] == 'true') {
-        //                 this.isChecked = true;
-        //             }
-        //         }
-        //     )
-        // }
+        async keyExchange() {
+          let dhParams = await window.crypto.subtle.generateKey({
+            'name': 'EDCH',
+            'namedCurve': 'P-256'
+          })
+          true,
+          ['deriveKey']
+        },
         initialize() {
             this.myUid = this.$store.state.myUid;
             this.myUsername = this.$store.state.myUsername;
