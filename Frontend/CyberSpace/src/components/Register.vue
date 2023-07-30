@@ -5,27 +5,49 @@ import md5 from 'js-md5'
 export default {
     data() {
         return {
-            uid: '1',
-            username: '1',
-            password: '1',
+            uid: '',
+            username: '',
+            password: '',
+            email: '',
+            code: '',
             isRegistered: false,
         }
     },
     methods: {
-        register() {
-            var params = {
-                'uid': this.uid,
-                'username':this.username,
-                'password':md5(this.password)
-            };
-            axios.post('api/accounts/register', params).then(
-                response => {
-                        this.isRegistered = true;
-                }
-            ).catch(error => {
-                this.$message('Uid is occupied. Choose another uid.')
-            })
+      sendCode() {
+        if (this.email != '') {
+          let params = {
+            'email': this.email,
+          }
+          axios.post('api/accounts/register/code', params).then(response => {
+            let status = response.data['status']
+            if (status == 'true') {
+              this.$message('An email for verification has been sent.')
+            }
+          }).catch(error => {
+            this.$message('Error.')
+          })
+        } else {
+          this.$message('Please enter your email first.')
         }
+        
+      },
+      register() {
+          let params = {
+              'uid': this.uid,
+              'username':this.username,
+              'password':md5(this.password),
+              'email': this.email,
+              'code': this.code
+          };
+          axios.post('api/accounts/register', params).then(
+              response => {
+                      this.isRegistered = true;
+              }
+          ).catch(error => {
+              this.$message('Uid is occupied. Choose another uid.')
+          })
+      }
     }
 }
 </script>
@@ -43,22 +65,73 @@ export default {
                     <el-col :span="8" />
                     <el-col :span="8">
                         <div v-if="isRegistered == false">
-                            <el-card class="box-card">
-                                <template #header>
-                                    <div class="card-header">
-                                        Thank you for registering,<br>
-                                        <div id="welcome">
-                                            {{ username }}
-                                        </div>
-                                    </div>
-                                </template>
-                                <el-input v-model="uid" placeholder="Uid" />
-                                <el-input v-model="username" placeholder="Username" />
-                                <el-input v-model="password" placeholder="Password" />
-                                <div id="submit">
-                                    <el-button id="button" type="success" size="large" @click="register">Submit</el-button>
+                          <el-card class="box-card">
+                            <template #header>
+                                  <div class="card-header">
+                                      Thank you for registering,<br>
+                                      <div id="welcome">
+                                          {{ username }}
+                                      </div>
+                                  </div>
+                            </template>
+                            <el-row>
+                              <el-col :span="4">
+                                <div class="option">
+                                  Uid
                                 </div>
-                            </el-card>
+                              </el-col>
+                              <el-col :span="20">
+                                  <el-input v-model="uid" placeholder="CANNOT be modified after registration" />
+                              </el-col>
+                            </el-row>
+                            <el-row>
+                              <el-col :span="4">
+                                <div class="option">
+                                  Username
+                                </div>
+                              </el-col>
+                              <el-col :span="20">
+                                <el-input v-model="username" placeholder="A cool name others call you by" />
+                              </el-col>
+                            </el-row>
+                            <el-row>
+                              <el-col :span="4">
+                                <div class="option">
+                                  Password
+                                </div>
+                              </el-col>
+                              <el-col :span="20" class="option">
+                                <el-input v-model="password" placeholder="Make it uneasy to guess" />
+                              </el-col>
+                            </el-row>
+                            <el-row>
+                              <el-col :span="4">
+                                <div class="option">
+                                  Email
+                                </div>
+                              </el-col>
+                              <el-col :span="20">
+                                <el-input v-model="email" placeholder="Only one account for one email">
+                                  <template #append>
+                                    <el-button @click="sendCode">Send code</el-button>
+                                  </template>
+                                </el-input>
+                              </el-col>
+                            </el-row>
+                            <el-row>
+                              <el-col :span="4">
+                                <div class="option">
+                                  Code
+                                </div>
+                              </el-col>
+                              <el-col :span="20">
+                                <el-input v-model="code" placeholder="Check your email after clicking the button" />
+                              </el-col>
+                            </el-row>
+                            <div id="submit">
+                                <el-button id="button" type="success" size="large" @click="register">Submit</el-button>
+                            </div>
+                          </el-card>
                         </div>
 
                         <!-- Registration succeeded -->
@@ -107,6 +180,11 @@ export default {
   font-weight: bold;
 }
 
+.option {
+  font-size: x-small;
+  justify-content: center;
+}
+
 #submit {
     margin-top: 5%;
 }
@@ -115,6 +193,7 @@ export default {
     width: 100%;
     margin: auto;
 }
+
 
 #welcome {
     font-style: italic;

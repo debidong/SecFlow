@@ -3,7 +3,7 @@ export default {
     data() {
         return{
             infos: {
-                "What's this?": 'CyberSpace is a chatroom with end-to-end encryption technologies,\n\
+                "What's this?": 'SecFlow is a chatroom with end-to-end encryption technologies,\n\
                 which tries to ensure your privacy in conversations. Server-side\n\
                 will not save your chat history, while you are able to save your\n\
                 chat history in browser-side.',
@@ -20,7 +20,7 @@ export default {
 <template>
 <div class="common-layout">
     <el-container>
-      <el-header><h1>CyberSpace</h1></el-header>
+      <el-header><h1>SecFlow</h1></el-header>
       <el-main>
         <el-carousel :interval="5000" arrow="hover">
             <el-carousel-item v-for="(value, key) in infos">

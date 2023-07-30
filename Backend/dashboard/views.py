@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 import utils
-from authentication import is_loggedin
+from auth import is_loggedin
 from accounts.models import User
 from .models import *
 from .serializer import UserSerializer, InboxSerializer

@@ -4,17 +4,20 @@ This project is a web application which is intended to realize a safe chatroom, 
 
 ## 1.1 Technologies
 
-|    Back-end     |      Front-end      |
-| :-------------: | :-----------------: |
-|     Django      | Vue \| Element Plus |
-| SQLite \| Redis |                     |
+|       Back-end        |      Front-end      |
+| :-------------------: | :-----------------: |
+|        Django         | Vue \| Element Plus |
+|    SQLite \| Redis    |        Vuex         |
+| Django REST framework |                     |
+|          JWT          |                     |
+|  Daphne \| Websocket  |                     |
 
 ## 1.2 Goals
 
 This project is still under developing, and here are all to-dos I've planned.
 
 - [x] Login/ Register
-- [ ] Logout
+- [x] Logout
 - [x] Inbox
 - [x] Reminder
 - [ ] Detailed personal bio
@@ -22,7 +25,8 @@ This project is still under developing, and here are all to-dos I've planned.
 - [x] Friend list
 - [ ] Group search/ Group list
 - [ ] Group list
-- [ ] Chatroom
+- [x] Chatroom
+- [ ] Cipher suite
 - [ ] Square
 - [ ] Settings/ Account management
 

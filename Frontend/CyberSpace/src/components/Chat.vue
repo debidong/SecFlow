@@ -98,10 +98,10 @@ export default {
 
         sendMsg() {
             let params = {
-                'myUid': this.myUid,
-                'time': Date.now(),
-                'content': this.msg,
-                'rid': this.rid
+              'myUid': this.myUid,
+              'time': Date.now(),
+              'content': this.msg,
+              'rid': this.rid
             };
 
             this.websocket.send(JSON.stringify(params))

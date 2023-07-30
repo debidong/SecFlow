@@ -3,135 +3,147 @@ import axios from 'axios';
 
 export default {
     data() {
-        return {
-            uid: '',
-            username: '',
-            loaded: false,
+      return {
+        uid: '',
+        username: '',
+        loaded: false,
 
-            // Reminder module
-            reminder: [],
-            topic: '',
+        // Reminder module
+        reminder: [],
+        topic: '',
 
-            friends: [],
-            inbox: []
-        }
+        friends: [],
+        inbox: []
+      }
     },
     methods: {
-        requireGET(url) {
-            var token = localStorage.getItem('token');
-            var config = {
-                headers: {
-                    'token': token,
-                }
-            };
-            var _url = 'api/user/dashboard/' + url;
-            return axios.get(_url, config)
-            .then((response) =>
-                response.data
-            )
-        },
+      requireGET(url) {
+        var token = localStorage.getItem('token');
+        var config = {
+          headers: {
+              'token': token,
+          }
+        };
+        var _url = 'api/user/dashboard/' + url;
+        return axios.get(_url, config)
+        .then((response) =>
+          response.data
+        )
+      },
 
-        requirePOST(url, params) {
-            var token = localStorage.getItem('token');
-            var config = {
-                headers: {
-                    'token': token,
-                }
-            };
-            var _url = 'api/user/dashboard/' + url;
-            return axios.post(_url, params, config).then(
-                (response) => response.data
-            )
+      requirePOST(url, params) {
+        var token = localStorage.getItem('token');
+        var config = {
+          headers: {
+              'token': token,
+          }
+        };
+        var _url = 'api/user/dashboard/' + url;
+        return axios.post(_url, params, config).then(
+          (response) => response.data
+        )
 
-        },
+      },
 
-        getUserInfo() {
-            this.requireGET('info').then((data) => {
-                this.uid = data['uid']; 
-                this.username = data['username'];
-            });
+      getUserInfo() {
+        this.requireGET('info').then((data) => {
+          this.uid = data['uid']; 
+          this.username = data['username'];
+        });
 
-        },
+      },
 
-        /* Module: Reminder */
-        getUserReminder() {
-            this.requireGET('reminder').then((data) => {
-                this.reminder = data['reminder'];
-            });
-        },
-        handleReminder(topic, action) {
-            var params = {
-                'topic': topic,
-                'action': action
-            }
-            this.requirePOST('reminder', params).then((data) => {
-                if(action == 'add') {
-                    this.topic = '';
-                }
-                this.getUserReminder();
-            })
-        },
-
-        /* Module: Friends */
-        getUserFriends() {
-            this.requireGET('friends').then((data) => {
-                this.friends = data['friends'];
-            })
-        },
-
-
-        handleFriendRequest(sender, anwser) {
-            var params = {
-                'sender': sender,
-                'anwser': anwser
-            };
-            this.requirePOST('userList/friendRequest/handle', params).then((data) => {
-                this.getUserInbox();
-                this.getUserFriends();
-            })
-        },
-
-        /* Module: Inbox */
-        getUserInbox() {
-            this.requireGET('inbox').then((data) => {
-                this.inbox = data['inbox'];
-            })
-        },
-
-
-        goToChatroom(uid, username) {
-            let token = localStorage.getItem('token');
-            let params = {
-                'myUid': this.uid,
-                'myUsername': this.username,
-                'uid': uid,
-                'username': username
-            };
-            let config = {
-                headers: {
-                    'token': token,
-                }
-            };
-            axios.post('api/chat/chatroom', params, config).then((response) => {
-                    let params = {
-                        'myUid': this.uid,
-                        'myUsername': this.username,
-                        'uid': uid,
-                        'username': username,
-                        'rid': response.data['rid']
-                    };
-
-                    this.$store.commit('setRoomInfo', params);
-                    this.$router.push('/chat');
-                })
+      /* Module: Reminder */
+      getUserReminder() {
+        this.requireGET('reminder').then((data) => {
+          this.reminder = data['reminder'];
+        });
+      },
+      handleReminder(topic, action) {
+        var params = {
+          'topic': topic,
+          'action': action
         }
+        this.requirePOST('reminder', params).then((data) => {
+            if(action == 'add') {
+              this.topic = '';
+            }
+          this.getUserReminder();
+        })
+      },
+
+      /* Module: Friends */
+      getUserFriends() {
+        this.requireGET('friends').then((data) => {
+          this.friends = data['friends'];
+        })
+      },
+
+
+      handleFriendRequest(sender, anwser) {
+        var params = {
+          'sender': sender,
+          'anwser': anwser
+        };
+        this.requirePOST('userList/friendRequest/handle', params).then((data) => {
+          this.getUserInbox();
+          this.getUserFriends();
+        })
+      },
+
+      /* Module: Inbox */
+      getUserInbox() {
+        this.requireGET('inbox').then((data) => {
+            this.inbox = data['inbox'];
+        })
+      },
+
+
+      goToChatroom(uid, username) {
+        let token = localStorage.getItem('token');
+        let params = {
+          'myUid': this.uid,
+          'myUsername': this.username,
+          'uid': uid,
+          'username': username
+        };
+        let config = {
+          headers: {
+            'token': token,
+          }
+        };
+        axios.post('api/chat/chatroom', params, config).then((response) => {
+            let params = {
+              'myUid': this.uid,
+              'myUsername': this.username,
+              'uid': uid,
+              'username': username,
+              'rid': response.data['rid']
+            };
+
+            this.$store.commit('setRoomInfo', params);
+            this.$router.push('/chat');
+        })
+      },
+
+      logout() {
+        let config = {
+          headers: {
+            'token': localStorage.getItem('token')
+          }
+        }
+        let url = 'api/accounts/' + this.uid
+        axios.delete(url, config).then(response => {
+          this.$router.push('/')
+        })
+      }
     },
 
     mounted() {
-        this.getUserInfo();
-        this.getUserReminder();
-        this.getUserFriends();
-        this.getUserInbox();
+      this.getUserInfo();
+      this.getUserReminder();
+      this.getUserFriends();
+      this.getUserInbox();
     }
 }
 </script>

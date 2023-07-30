@@ -8,14 +8,13 @@ import string
 class User(models.Model):
     username = models.CharField(max_length=16)
     password = models.CharField(max_length=32)
+    email = models.EmailField()
     uid = models.CharField(unique=True, max_length=20)
     salt = models.CharField(max_length=32)
     friend = models.ManyToManyField('self', symmetrical=False)
 
-    def set_user_info(self, username, password, uid):
-        self.username = username
-        self.uid = uid
-
+    # Set MD5(password + salt) as password
+    def set_password(self, password):
         # generate random string for salt
         letters = string.ascii_letters
         self.salt = ''.join(random.choice(letters) for i in range(32))
@@ -23,11 +22,11 @@ class User(models.Model):
         self.password = hash_digest
 
     @staticmethod
-    def check_user_exists(uid) -> bool:
-        user = User.objects.all().filter(uid=uid)
-        if not user.exists():
+    def exists(uid) -> bool:
+        if not User.objects.filter(uid=uid).exists():
             return False
-        return True
+        else:
+            return True
 
     @staticmethod
     def check_password(uid, password):
