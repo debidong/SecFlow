@@ -11,8 +11,13 @@ def set(key: str, value:str, **kwargs):
     else:
         redis_client.set(key,value)
 
-def get(key:str) -> str:
-    return redis_client.get(key).decode()
+def get(key:str):
+    value = redis_client.get(key)
+    if value == None:
+        return None
+    else:
+        return value.decode()
+    
 
 def delete(key:str):
     redis_client.delete(key)

@@ -52,7 +52,6 @@ class ReminderView(APIView):
         # Add or delete a reminder with matched user.
         try:
             topic = request.data.get('topic')
-            print(topic)
             user = utils.get_user_from_token(request)
             action = request.data.get('action')
             if action == 'add':
@@ -62,9 +61,7 @@ class ReminderView(APIView):
                 return Response(status=status.HTTP_200_OK)
             elif action == 'delete':
                 # Maybe there are many reminders with the same topic
-                reminders = Reminder.objects.filter(topic=topic)
-                for reminder in reminders:
-                    reminder.delete()
+                Reminder.objects.filter(topic=topic).delete()
                 return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)   

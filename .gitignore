@@ -3,7 +3,7 @@
 Backend/config.py
 
 # # Ignore __pycache__ folders
-# __pycache__/
+__pycache__/
 
 # # Ignore node_modules folder
 # node_modules/

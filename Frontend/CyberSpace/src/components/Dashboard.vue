@@ -7,7 +7,7 @@ export default {
         uid: '',
         username: '',
         loaded: false,
-
+        config: {},
         // Reminder module
         reminder: [],
         topic: '',
@@ -17,29 +17,25 @@ export default {
       }
     },
     methods: {
-      requireGET(url) {
-        var token = localStorage.getItem('token');
-        var config = {
+      getToken() {
+        this.config = {
           headers: {
-              'token': token,
+            'token': localStorage.getItem('token')
           }
-        };
-        var _url = 'api/user/dashboard/' + url;
-        return axios.get(_url, config)
+        }
+      },
+
+      requireGET(url) {
+        var url_ = 'api/user/dashboard/' + url;
+        return axios.get(url_, this.config)
         .then((response) =>
           response.data
         )
       },
 
       requirePOST(url, params) {
-        var token = localStorage.getItem('token');
-        var config = {
-          headers: {
-              'token': token,
-          }
-        };
-        var _url = 'api/user/dashboard/' + url;
-        return axios.post(_url, params, config).then(
+        var url_ = 'api/user/dashboard/' + url;
+        return axios.post(url_, params, this.config).then(
           (response) => response.data
         )
 
@@ -49,14 +45,21 @@ export default {
         this.requireGET('info').then((data) => {
           this.uid = data['uid']; 
           this.username = data['username'];
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
         });
-
       },
 
       /* Module: Reminder */
       getUserReminder() {
         this.requireGET('reminder').then((data) => {
           this.reminder = data['reminder'];
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
         });
       },
       handleReminder(topic, action) {
@@ -69,14 +72,22 @@ export default {
               this.topic = '';
             }
           this.getUserReminder();
-        })
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
+        });
       },
 
       /* Module: Friends */
       getUserFriends() {
         this.requireGET('friends').then((data) => {
           this.friends = data['friends'];
-        })
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
+        });
       },
 
 
@@ -95,7 +106,11 @@ export default {
       getUserInbox() {
         this.requireGET('inbox').then((data) => {
             this.inbox = data['inbox'];
-        })
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
+        });
       },
 
 
@@ -123,23 +138,30 @@ export default {
 
             this.$store.commit('setRoomInfo', params);
             this.$router.push('/chat');
-        })
+        }).catch(error => {
+          if(error.response.status == 401) {
+            this.$router.push('/login')
+          }
+        });
       },
 
       logout() {
-        let config = {
-          headers: {
-            'token': localStorage.getItem('token')
-          }
-        }
         let url = 'api/accounts/' + this.uid
-        axios.delete(url, config).then(response => {
+        axios.delete(url, this.config).then(response => {
+          this.$router.push('/')
+        })
+      },
+
+      deleteAccount() {
+        let url = 'api/accounts/' + this.uid
+        axios.delete(url, this.config).then(response => {
           this.$router.push('/')
         })
       }
     },
 
     mounted() {
+      this.getToken();
       this.getUserInfo();
       this.getUserReminder();
       this.getUserFriends();
@@ -216,7 +238,7 @@ export default {
                         </div>
                     </el-card>
                     <!-- groups -->
-                    <el-card class="box-card1">
+                    <!-- <el-card class="box-card1">
                         <template #header>
                         <div class="card-header1">
                             <span>Groups</span>
@@ -225,7 +247,7 @@ export default {
                         <div>
                             Under construction
                         </div>
-                    </el-card>
+                    </el-card> -->
                 </el-col>
             
                 <!-- right column -->
@@ -288,7 +310,21 @@ export default {
                             <br>
                             <el-button id="button" type="info" size="default" @click="change_password">Change Password</el-button>
                             <br>
-                            <el-button id="button" type="danger" size="default" @click="delete_account">Delete Account</el-button>
+                              <el-popover
+                              id="button"
+                              trigger="click"
+                              placement="top"
+                              :width="fit-content">
+                              <el-text type="danger" id="button" tag="p">All your data will be deleted irreversibly.</el-text>
+                              <el-text type="danger" id="button" tag="p">Continue?</el-text>
+
+                              <!-- <p>All your data will be deleted irreversibly.</p>
+                              <p>Continue?</p> -->
+                              <el-button id="button" size="default" type="danger" @click="deleteAccount">Confirm</el-button>
+                              <template #reference>
+                              <el-button id="button" type="danger" size="default">Delete Account</el-button>
+                              </template>
+                            </el-popover>
                         </div>
                     </el-card>
                 </el-col>
