@@ -1,3 +1,10 @@
+This web application aims to satisfy such demands:
+
+- Local network with no Internet connection, but lack of ***a light-weight tool*** to communicate online.
+- Unwilling to transport messages through unprivate server, but only wish to enjoy communication service which can **easily deployed** on his own, with ***high-level security*** as well as ***fast speed***.
+
+Based on these demands, **SecFlow** comes up.
+
 # 1 About this project
 
 This project is a web application which is intended to realize a safe chatroom, which is both easy to deploy and handy to use.
@@ -28,7 +35,7 @@ This project is still under developing, and here are all to-dos I've planned.
 - [x] Chatroom
 - [ ] Cipher suite
 - [ ] Square
-- [ ] Settings/ Account management
+- [x] Settings/ Account management
 
 # 2 Running this project
 
