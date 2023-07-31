@@ -64,13 +64,14 @@ class UserView(APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         if User.exists(uid=uid):
             user = User.objects.get(uid=uid)
-            Room.objects.filter(user=user).delete()
+            Room.objects.filter(users=user).delete()
             Message.objects.filter(user=user).delete()
             Reminder.objects.filter(user=user).delete()
 
 
             
-            FriendRequest.objects.filter(user=user).delete()
+            FriendRequest.objects.filter(sender=user).delete()
+            FriendRequest.objects.filter(receiver=user).delete()
             User.objects.get(uid=uid).delete()
             return Response(status=status.HTTP_200_OK)
         else:

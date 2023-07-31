@@ -22,7 +22,7 @@ export default {
     methods: {
         async keyExchange() {
           let dhParams = await window.crypto.subtle.generateKey({
-            'name': 'EDCH',
+            'name': 'ECDH',
             'namedCurve': 'P-256'
           })
           true,
