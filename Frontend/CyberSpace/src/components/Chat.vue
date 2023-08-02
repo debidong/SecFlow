@@ -1,7 +1,7 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios'
-
+import {createKeyPair, importKeyfromJWK, createSharedKey} from '@/utils/cipher.js'
 
 
 export default {
@@ -12,7 +12,10 @@ export default {
             uid: '',
             username: '',
             rid: '',
+            
             secretKey: '',
+            ECDHKeypair: {},
+            
             isChecked: false,
             websocket: null,
             msg: '',
@@ -20,13 +23,12 @@ export default {
         }
     },
     methods: {
-        async keyExchange() {
-          let dhParams = await window.crypto.subtle.generateKey({
-            'name': 'ECDH',
-            'namedCurve': 'P-256'
-          })
-          true,
-          ['deriveKey']
+        getECDHKeypair() {
+          const ECDHKeypair = createKeyPair()
+          console.log(ECDHKeypair.privateKey)
+        },
+        exchangeKey() {
+          
         },
         initialize() {
             this.myUid = this.$store.state.myUid;
@@ -38,7 +40,7 @@ export default {
         handleMsg() {
             let isFirstCall = true;
 
-            const saveToLocal = (msg) => {
+            const saveToLocal = (msg) => {1
                 if (isFirstCall) {
                     msg.forEach(params => {
                         this.chatHistory.push({
